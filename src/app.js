@@ -4,17 +4,17 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 
 const app = express();
-
+const cookieParser = require("cookie-parser");
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
-
+app.use(cookieParser());
 app.use("/api/auth", require("./modules/auth/auth.routes"));
 app.use("/api/users", require("./modules/users/user.routes"));
 app.use("/api/roles", require("./modules/roles/role.routes"));
 app.use("/api/permissions", require("./modules/permissions/permission.routes"));
 app.use("/api/pharmacy", require("./modules/pharmacy/pharmacy.routes"));
-
-
+app.use("/api/doctors", require("./modules/doctors/doctor.routes"));
+app.use("/api/suppliers", require("./modules/suppliers/supplier.routes"));
 module.exports = app;

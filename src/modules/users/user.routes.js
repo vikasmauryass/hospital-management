@@ -10,4 +10,6 @@ router.get("/", userController.getUsers);
 // assign role
 router.post("/:userId/assign-role", userController.assignRoleToUser);
 
+router.delete("/:id", userController.deleteUser);
+
 module.exports = router;

@@ -5,10 +5,11 @@ const Permission = require("../permissions/permission.model");
 exports.createRole = async (req, res) => {
   try {
     const { name } = req.body;
+    const { permissionIds } = req.body;
 
-    const role = await Role.create({ name });
-
-    res.status(201).json(role);
+    const role = await Role.create({ name, permissions: permissionIds || [] });
+    const populated = await role.populate("permissions");
+    res.status(201).json(populated);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
