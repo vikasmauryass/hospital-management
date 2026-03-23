@@ -11,6 +11,7 @@ const supplierSchema = new mongoose.Schema(
     address: { type: String, default: null },
     product: { type: String, required: true },
     pharmacy: { type: mongoose.Schema.Types.ObjectId, ref: "Pharmacy", default: null },
+    organization: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", default: null },
   },
   { timestamps: true }
 );

@@ -17,4 +17,6 @@ app.use("/api/permissions", require("./modules/permissions/permission.routes"));
 app.use("/api/pharmacy", require("./modules/pharmacy/pharmacy.routes"));
 app.use("/api/doctors", require("./modules/doctors/doctor.routes"));
 app.use("/api/suppliers", require("./modules/suppliers/supplier.routes"));
+app.use("/api/organizations", require("./modules/organization/organization.routes"));
+app.use("/api/products", require("./modules/products/product.routes"));
 module.exports = app;

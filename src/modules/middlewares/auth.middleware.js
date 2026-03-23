@@ -1,4 +1,3 @@
-// src/middlewares/auth.middleware.js
 const jwt = require("jsonwebtoken");
 const User = require("../users/user.model");
 
@@ -22,8 +21,8 @@ exports.protect = async (req, res, next) => {
     }
 
     const user = await User.findById(decoded.id)
-      .populate({ path: "roles", populate: { path: "permissions" } })
-      .populate("pharmacy"); // ← added: so req.user.pharmacy is available in all protected routes
+      .populate("roles")
+      .populate("pharmacy");
 
     if (!user) return res.status(401).json({ message: "User not found" });
 

@@ -13,7 +13,8 @@ const pharmacySchema = new mongoose.Schema(
     },
     phone: String,
     ms: String,
-    address: String
+    address: String,
+    organization: { type: mongoose.Schema.Types.ObjectId, ref: "Organization", default: null },
   },
   { timestamps: true }
 );

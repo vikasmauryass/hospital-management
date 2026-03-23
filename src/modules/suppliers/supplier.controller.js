@@ -1,8 +1,12 @@
-// src/modules/suppliers/supplier.controller.js
-
 const Supplier = require("./supplier.model");
 
 const fail = (res, status, message) => res.status(status).json({ error: message });
+
+// 👇 same helper as product controller — pulls from logged-in user
+const getScope = (req) => ({
+  pharmacy: req.user?.pharmacy?._id || req.user?.pharmacy || null,
+  organization: req.user?.organization?._id || req.user?.organization || null,
+});
 
 // ─── CREATE ───────────────────────────────────────────────────────────────────
 exports.createSupplier = async (req, res) => {
@@ -16,8 +20,7 @@ exports.createSupplier = async (req, res) => {
     const existing = await Supplier.findOne({ email });
     if (existing) return fail(res, 400, "A supplier with this email already exists");
 
-    // ✅ Read pharmacyId from the logged-in user — not from request body
-    const pharmacyId = req.user?.pharmacy?._id || req.user?.pharmacy || null;
+    const { pharmacy, organization } = getScope(req); // 👈 auto from logged-in user
 
     const supplier = await Supplier.create({
       companyName,
@@ -26,49 +29,57 @@ exports.createSupplier = async (req, res) => {
       gstNo,
       address: address || null,
       product,
-      pharmacy: pharmacyId,
+      pharmacy,       // 👈 auto
+      organization,   // 👈 auto
     });
 
-    const populated = await Supplier.findById(supplier._id).populate("pharmacy");
-    res.status(201).json(populated);
+    const populated = await Supplier.findById(supplier._id)
+      .populate("pharmacy")
+      .populate("organization");
+
+    return res.status(201).json(populated);
   } catch (error) {
-    fail(res, 500, error.message);
+    return fail(res, 500, error.message);
   }
 };
 
-// ─── GET ALL (only suppliers belonging to the logged-in user's pharmacy) ──────
+// ─── GET ALL ──────────────────────────────────────────────────────────────────
 exports.getSuppliers = async (req, res) => {
   try {
-    // ✅ Filter by the user's pharmacy automatically
-    const pharmacyId = req.user?.pharmacy?._id || req.user?.pharmacy || null;
+    const { pharmacy, organization } = getScope(req); // 👈 auto filter
 
-    const query = pharmacyId ? { pharmacy: pharmacyId } : {};
+    const query = {};
+    if (pharmacy) query.pharmacy = pharmacy;
+    else if (organization) query.organization = organization;
 
     const suppliers = await Supplier.find(query)
       .populate("pharmacy")
+      .populate("organization")
       .sort({ createdAt: -1 });
 
-    res.json(suppliers);
+    return res.json(suppliers);
   } catch (error) {
-    fail(res, 500, error.message);
+    return fail(res, 500, error.message);
   }
 };
 
 // ─── GET ONE ──────────────────────────────────────────────────────────────────
 exports.getSupplier = async (req, res) => {
   try {
-    const supplier = await Supplier.findById(req.params.id).populate("pharmacy");
+    const supplier = await Supplier.findById(req.params.id)
+      .populate("pharmacy")
+      .populate("organization");
+
     if (!supplier) return fail(res, 404, "Supplier not found");
-    res.json(supplier);
+    return res.json(supplier);
   } catch (error) {
-    fail(res, 500, error.message);
+    return fail(res, 500, error.message);
   }
 };
 
 // ─── UPDATE ───────────────────────────────────────────────────────────────────
 exports.updateSupplier = async (req, res) => {
   try {
-    // ✅ pharmacyId is NOT accepted from body — it stays as the user's pharmacy
     const { companyName, email, phone, gstNo, address, product } = req.body;
 
     const supplier = await Supplier.findById(req.params.id);
@@ -85,14 +96,17 @@ exports.updateSupplier = async (req, res) => {
     if (gstNo !== undefined) supplier.gstNo = gstNo;
     if (address !== undefined) supplier.address = address || null;
     if (product !== undefined) supplier.product = product;
-    // pharmacy is intentionally NOT updated here
+    // pharmacy & organization NOT updated — stays as original scope
 
     await supplier.save();
 
-    const updated = await Supplier.findById(supplier._id).populate("pharmacy");
-    res.json(updated);
+    const updated = await Supplier.findById(supplier._id)
+      .populate("pharmacy")
+      .populate("organization");
+
+    return res.json(updated);
   } catch (error) {
-    fail(res, 500, error.message);
+    return fail(res, 500, error.message);
   }
 };
 
@@ -101,8 +115,8 @@ exports.deleteSupplier = async (req, res) => {
   try {
     const supplier = await Supplier.findByIdAndDelete(req.params.id);
     if (!supplier) return fail(res, 404, "Supplier not found");
-    res.json({ message: "Supplier deleted successfully" });
+    return res.json({ message: "Supplier deleted successfully" });
   } catch (error) {
-    fail(res, 500, error.message);
+    return fail(res, 500, error.message);
   }
 };

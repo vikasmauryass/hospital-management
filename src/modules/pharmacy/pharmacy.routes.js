@@ -1,19 +1,11 @@
 const router = require("express").Router();
 const pharmacyController = require("./pharmacy.controller");
+const { protect } = require("../../modules/middlewares/auth.middleware");
 
-// create pharmacy
-router.post("/", pharmacyController.createPharmacy);
-
-// get all pharmacy
-router.get("/", pharmacyController.getPharmacies);
-
-// get single pharmacy
-router.get("/:id", pharmacyController.getPharmacy);
-
-// update pharmacy
-router.put("/:id", pharmacyController.updatePharmacy);
-
-// delete pharmacy
-router.delete("/:id", pharmacyController.deletePharmacy);
+router.post("/", protect, pharmacyController.createPharmacy);
+router.get("/", protect, pharmacyController.getPharmacies);
+router.get("/:id", protect, pharmacyController.getPharmacy);
+router.put("/:id", protect, pharmacyController.updatePharmacy);
+router.delete("/:id", protect, pharmacyController.deletePharmacy);
 
 module.exports = router;
