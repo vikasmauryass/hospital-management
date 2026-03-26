@@ -19,4 +19,7 @@ app.use("/api/doctors", require("./modules/doctors/doctor.routes"));
 app.use("/api/suppliers", require("./modules/suppliers/supplier.routes"));
 app.use("/api/organizations", require("./modules/organization/organization.routes"));
 app.use("/api/products", require("./modules/products/product.routes"));
+app.use("/api/purchases", require("./modules/purchase/purchase.routes"));
+// app.use("/api/inventory", require("./modules/inventory/inventory.routes"));
+
 module.exports = app;

@@ -14,15 +14,18 @@ exports.createProduct = async (req, res) => {
     const {
       medicineName,
       manufacturerName,
-      boxComposition,
+      // boxComposition,
       medicineType,
       gstPercentage,
       hsnCode,
       composition,
       price,
+      strip,
+      quantity
     } = req.body;
 
-    if (!medicineName || !manufacturerName || !boxComposition || !medicineType ||
+    if (!medicineName || !manufacturerName || !strip ||
+      !quantity || !medicineType ||
       gstPercentage === undefined || !hsnCode || !composition || !price) {
       return fail(res, 400, "All fields are required");
     }
@@ -36,7 +39,7 @@ exports.createProduct = async (req, res) => {
     const product = await Product.create({
       medicineName,
       manufacturerName,
-      boxComposition,
+      // boxComposition,
       medicineType,
       gstPercentage: Number(gstPercentage),
       hsnCode,
@@ -44,6 +47,8 @@ exports.createProduct = async (req, res) => {
       price: Number(price),
       pharmacy,
       organization,
+      strip,
+      quantity
     });
 
     const populated = await Product.findById(product._id)
@@ -97,7 +102,7 @@ exports.updateProduct = async (req, res) => {
     const {
       medicineName,
       manufacturerName,
-      boxComposition,
+      // boxComposition,
       medicineType,
       gstPercentage,
       hsnCode,
@@ -114,7 +119,8 @@ exports.updateProduct = async (req, res) => {
 
     if (medicineName !== undefined) product.medicineName = medicineName;
     if (manufacturerName !== undefined) product.manufacturerName = manufacturerName;
-    if (boxComposition !== undefined) product.boxComposition = boxComposition;
+    // if (boxComposition !== undefined) product.boxComposition = boxComposition;
+    if (strip == undefined) product.strip = strip;
     if (medicineType !== undefined) product.medicineType = medicineType;
     if (gstPercentage !== undefined) product.gstPercentage = Number(gstPercentage);
     if (hsnCode !== undefined) product.hsnCode = hsnCode;
